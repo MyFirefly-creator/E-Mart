@@ -152,7 +152,7 @@ const deleteProductcart = async (cartDetailId) => {
     const confirmed = confirm('Yakin ingin menghapus item ini dari keranjang?')
     if (!confirmed) return
 
-    await api.delete(`/cart-detail/${cartDetailId}`)
+    await api.delete(`/detailcart/${cartDetailId}`)
     await getCart()
   } catch (error) {
     console.error('Gagal menghapus item cart:', error)
