@@ -131,17 +131,6 @@
           ></textarea>
         </div>
 
-        <!-- Label Alamat Gabungan -->
-        <div class="mb-4">
-          <label class="block mb-1">Gabungan Alamat (Label)</label>
-          <input
-            type="text"
-            v-model="form.label"
-            class="w-full border px-3 py-2 rounded bg-gray-100"
-            readonly
-          />
-        </div>
-
         <!-- Cari Kode Domestik -->
         <div class="mb-4 flex items-center space-x-2">
           <button
@@ -156,7 +145,6 @@
           </span>
         </div>
 
-        <!-- Hasil Pencarian Kode Domestik -->
         <div v-if="searchResults.length" class="mb-4">
           <label for="selectedAlamat" class="block mb-1 font-semibold">Pilih Kode Domestik</label>
           <select
@@ -175,7 +163,6 @@
           </select>
         </div>
 
-        <!-- Tombol Submit -->
         <button
           type="submit"
           class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -217,7 +204,6 @@ const form = ref({
   detail_alamat: ''
 });
 
-// Watch perubahan alamat untuk update label
 watch(
   () => [
     form.value.subdistrict_name,
@@ -235,7 +221,6 @@ watch(
   }
 );
 
-// Ambil profil user
 const user = ref({});
 
 const getProfile = async () => {
@@ -248,7 +233,6 @@ const getProfile = async () => {
   }
 };
 
-// Submit Form
 const submitForm = async () => {
   try {
     const response = await api.post('/toko', form.value);
@@ -356,11 +340,13 @@ const cariKodeDomestik = async () => {
   }
 };
 
-const pilihAlamat = (item) => {
-  form.value.kode_domestik = item.id;
-  form.value.label = item.label;
+const pilihAlamatDariDropdown = (event) => {
+  const selectedItem = JSON.parse(event.target.value);
+  form.value.kode_domestik = selectedItem.id;
+  form.value.label = selectedItem.label;
   searchResults.value = [];
 };
+
 
 // Load data awal
 onMounted(() => {
