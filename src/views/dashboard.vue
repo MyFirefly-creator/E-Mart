@@ -55,7 +55,7 @@
     <!-- Produk -->
     <template v-else>
       <div v-for="product in products" :key="product.id">
-        <product :product="product" :namaToko="getNamaToko(product)" class="h-72"/>
+        <Product :product="product" :namaToko="getNamaToko(product)" class="h-72"/>
       </div>
     </template>
 
@@ -85,7 +85,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Navbar from '@/components/navbar/navbar.vue'
-import product from '@/components/card/product.vue'
+import Product from '@/components/card/product.vue'
 import api from "@/plugins/axios"
 import Skeleton from "@/components/Skeleton.vue"
 import Carousel from '@/components/card/carousel.vue'
