@@ -161,6 +161,7 @@ const fetchProducts = async (page = 1) => {
 
       currentPage.value = response.data.data.current_page
       lastPage.value = response.data.data.last_page
+      console.log("Produk berhasil diambil:", products.value)
     } else {
       products.value = []
     }
