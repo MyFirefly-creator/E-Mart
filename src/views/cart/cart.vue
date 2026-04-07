@@ -1,80 +1,145 @@
 <template>
-    <Navbar />
-  <div class="p-4 space-y-4 bg-[#FFF5F5] min-h-screen">
-    <h1 class="text-xl font-bold text-[#7D0A0A] mb-4">Keranjang</h1>
+  <Navbar />
+  <div class="p-4 min-h-screen bg-[#FFFFFF]">
+    <h1 class="text-2xl font-bold navbar-font mb-4">| Keranjang</h1>
 
-    <div v-if="cart && cart.cart_detail.length" class="space-y-3">
-      <div
-        v-for="item in cart.cart_detail"
-        :key="item.id"
-        class="bg-white rounded-lg shadow flex p-3 items-center"
-      >
-        <img
-          :src="item.product?.foto_cover || 'https://via.placeholder.com/100'"
-          alt="Produk"
-          class="w-16 h-16 object-cover rounded mr-3 border"
-        />
-        <div class="flex-1">
-          <h2 class="text-sm font-semibold text-gray-800">
-            {{ item.product?.nama_product || 'Produk tidak ditemukan' }}
-          </h2>
-          <p class="text-xs text-gray-500 mt-1">Toko: {{ item.product?.nama_toko || 'Default Store' }}</p>
-          <div class="flex justify-between items-center mt-2">
-            <p class="text-sm font-bold text-red-600">
-              Rp {{ formatRupiah(item.harga) }}
+    <template v-if="isLoading">
+      <div v-for="n in 3" :key="n" class="flex items-center bg-white rounded-2xl shadow-md p-4 border border-gray-200 animate-pulse space-x-4">
+        <Skeleton width="24px" height="24px" />
+        <Skeleton width="80px" height="80px" />
+        <div class="flex-1 space-y-2">
+          <Skeleton width="60%" height="20px"/>
+          <Skeleton width="40%" height="16px"/>
+          <Skeleton width="80%" height="14px"/>
+          <Skeleton width="50%" height="16px"/>
+        </div>
+        <Skeleton width="60px" height="30px" />
+        <div class="flex space-x-2">
+          <Skeleton width="28px" height="28px"/>
+          <Skeleton width="40px" height="28px"/>
+          <Skeleton width="28px" height="28px"/>
+        </div>
+      </div>
+    </template>
+
+    <template v-else-if="cart?.cart_detail?.length">
+      <div class="space-y-4">
+        <div
+          v-for="item in cart.cart_detail"
+          :key="item.id"
+          class="flex items-center bg-white rounded-2xl shadow-md p-4 border border-gray-200"
+        >
+          <!-- ✅ Checkbox -->
+          <input
+            type="checkbox"
+            v-model="selectedIds"
+            :value="item.id"
+            class="mr-3 w-5 h-5 text-[#BF3131] border-gray-300 rounded"
+          />
+
+          <img
+            :src="item.product?.foto_cover || 'https://placehold.co/100'"
+            alt="Produk"
+            class="w-20 h-20 object-cover rounded-lg border border-gray-200 mr-4"
+          />
+
+          <div class="flex-1">
+            <h2 class="font-bold text-lg text-black leading-tight">
+              {{ item.product?.nama_product || 'Produk tidak ditemukan' }}
+            </h2>
+
+            <p class="text-sm text-gray-500">
+              Toko : {{ item.product?.user?.toko?.nama_toko }}
             </p>
-            <div class="flex items-center space-x-2">
-              <div class="flex items-center space-x-2">
-                    <button
-                        @click="decrementQuantity(item)"
-                        class="px-2 py-0.5 bg-gray-200 rounded text-sm"
-                    >
-                        −
-                    </button>
-                    <span class="text-sm">{{ item.jumlah }}</span>
-                    <button
-                        @click="incrementQuantity(item)"
-                        class="px-2 py-0.5 bg-gray-200 rounded text-sm"
-                    >
-                        ＋
-                    </button>
-                </div>
+
+            <p class="text-sm text-gray-600 mt-1">
+              {{ item.product?.deskripsi || 'Deskripsi tidak tersedia' }}
+            </p>
+
+            <div class="mt-2 space-y-0.5">
+              <p class="text-xs text-gray-500">
+                Harga satuan:
+                <span class="font-semibold text-black">
+                  Rp {{ formatRupiah(item.product?.harga) }}
+                </span>
+              </p>
+              <p class="text-sm font-bold text-[#BF3131]">
+                Subtotal: Rp {{ formatRupiah(item.harga) }}
+              </p>
             </div>
           </div>
+
+          <button
+            @click="deleteProductcart(item.id)"
+            class="bg-[#BF3131] hover:bg-[#a32727] text-white px-3 py-1 rounded-md text-sm ml-4"
+          >
+            Delete
+          </button>
+
+          <div class="flex items-center space-x-2 ml-4">
+            <button
+              @click="decrementQuantity(item)"
+              class="w-7 h-7 flex items-center justify-center bg-gray-200 rounded text-lg font-bold"
+            >−</button>
+
+            <input
+              type="number"
+              min="1"
+              :max="item.product?.stok"
+              v-model.number="item.jumlah"
+              @input="onQuantityChange(item)"
+              class="w-12 h-8 text-center border border-gray-300 rounded-md text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#BF3131]"
+            />
+
+            <button
+              @click="incrementQuantity(item)"
+              class="w-7 h-7 flex items-center justify-center bg-gray-200 rounded text-lg font-bold"
+            >＋</button>
+          </div>
         </div>
-        <button
-          @click="deleteProductcart(item.id)"
-          class="text-red-500 text-xs ml-2"
+
+        <div
+          class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-300 px-4 py-3 flex justify-end items-center space-x-4 shadow-md"
         >
-          ✕
-        </button>
-      </div>
+          <div class="flex items-center pr-4 border-r border-gray-300">
+            <!-- ✅ Ganti total pakai selectedTotal -->
+            <span class="font-bold text-lg">
+              Total : Rp {{ formatRupiah(selectedTotal) }}
+            </span>
+          </div>
 
-      <div class="text-right mt-4 border-t pt-4">
-        <p class="text-sm text-gray-700">Total:</p>
-        <p class="text-lg font-bold text-[#7D0A0A]">Rp {{ formatRupiah(cart.total_harga) }}</p>
-        <button 
-        @click="checkoutCart"
-        class="mt-3 w-full py-2 bg-[#BF3131] text-white rounded-md hover:bg-[#a32727] text-sm font-semibold">
-          Checkout
-        </button>
+          <!-- ✅ Tombol checkout -->
+          <button
+            class="bg-[#BF3131] hover:bg-[#a32727] text-white px-6 py-2 rounded-md font-semibold"
+            @click="checkoutSelected"
+          >
+            Checkout
+          </button>
+        </div>
       </div>
-    </div>
+      
+    </template>
 
-    <div v-else class="text-center py-20 text-gray-400">
-      Keranjang masih kosong...
-    </div>
+    <template v-else>
+      <div class="text-center py-20 text-gray-400">
+        Keranjang masih kosong...
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import api from '@/plugins/axios'
 import Navbar from '@/components/navbar/navbar.vue'
 import router from '@/router'
+import { showSuccess, showError, showConfirm } from '@/utils/alert'
+import Skeleton from '@/components/Skeleton.vue'
 
 const cart = ref(null)
-const allProducts = ref([])
+const selectedIds = ref([])
+const isLoading = ref(true)
+let updateTimeout = null
 
 const formatRupiah = (value) => {
   return new Intl.NumberFormat('id-ID', {
@@ -83,94 +148,115 @@ const formatRupiah = (value) => {
   }).format(value)
 }
 
-const getAllProducts = async () => {
-  try {
-    const response = await api.get('/product')
-    allProducts.value = response.data.data.data
-  } catch (error) {
-    console.error('Gagal mengambil semua produk:', error)
-  }
-}
+// ✅ Hitung total harga dari item yang dicentang
+const selectedTotal = computed(() => {
+  if (!cart.value?.cart_detail) return 0
+  return cart.value.cart_detail
+    .filter(item => selectedIds.value.includes(item.id))
+    .reduce((sum, item) => sum + (item.harga || 0), 0)
+})
 
 const getCart = async () => {
   try {
     const response = await api.get('/cart')
-    if (response.data.data.length > 0) {
-      const cartData = response.data.data[0]
+    const data = response.data.data
 
-      for (const item of cartData.cart_detail) {
-        const found = allProducts.value.find(p => p.id === item.product_id)
-        item.product = found || null
-      }
-
-      cart.value = cartData
+    if (Array.isArray(data)) {
+      cart.value = data[0] || { cart_detail: [], total_harga: 0 }
+    } else {
+      cart.value = data || { cart_detail: [], total_harga: 0 }
     }
   } catch (error) {
-    console.error('Gagal mengambil data keranjang:', error)
+    showError('Gagal mengambil data keranjang')
+    console.error(error)
+  } finally {
+    isLoading.value = false
+  } 
+}
+
+const onQuantityChange = (item) => {
+  if (item.jumlah < 1) item.jumlah = 1
+
+  if (item.product?.stok && item.jumlah > item.product.stok) {
+    item.jumlah = item.product.stok
+    showError(`Jumlah melebihi stok! Maksimal hanya ${item.product.stok}`)
   }
+
+  clearTimeout(updateTimeout)
+  updateTimeout = setTimeout(() => {
+    updateCartItem(item, item.jumlah)
+  }, 800)
 }
 
 const updateCartItem = async (item, newJumlah) => {
-  if (newJumlah < 1) return 
-
   try {
     await api.put(`/detailcart/${item.id}`, {
       jumlah: newJumlah,
       product_id: item.product_id,
     })
     await getCart()
+    showSuccess('Jumlah produk diperbarui')
   } catch (error) {
-    console.error('Gagal memperbarui jumlah produk:', error)
+    showError('Gagal memperbarui jumlah produk')
+    console.error(error)
   }
 }
 
 const incrementQuantity = (item) => {
-  updateCartItem(item, item.jumlah + 1)
+  if (item.product?.stok && item.jumlah >= item.product.stok) {
+    item.jumlah = item.product.stok
+    showError(`Jumlah melebihi stok! Maksimal hanya ${item.product.stok}`)
+    return
+  }
+
+  item.jumlah++
+  updateCartItem(item, item.jumlah)
 }
 
 const decrementQuantity = (item) => {
-  updateCartItem(item, item.jumlah - 1)
-}
-
-const checkoutCart = async () => {
-  try {
-    const confirmed = confirm('Yakin ingin melakukan checkout?')
-    if (!confirmed) return
-
-    await api.post('/checkout') 
-    alert('Checkout berhasil!')
-    cart.value = null 
-    router.push('/checkout')
-  } catch (error) {
-    console.error('Gagal checkout:', error)
-    alert('Checkout gagal, coba lagi.')
+  if (item.jumlah > 1) {
+    item.jumlah--
+    updateCartItem(item, item.jumlah)
   }
 }
 
 const deleteProductcart = async (cartDetailId) => {
   try {
-    const confirmed = confirm('Yakin ingin menghapus item ini dari keranjang?')
+    const confirmed = await showConfirm('Yakin ingin menghapus item ini dari keranjang?')
     if (!confirmed) return
 
     await api.delete(`/detailcart/${cartDetailId}`)
     await getCart()
+    showSuccess('Produk berhasil dihapus dari keranjang')
   } catch (error) {
-    console.error('Gagal menghapus item cart:', error)
+    showError('Gagal menghapus produk dari keranjang')
+    console.error(error)
+  }
+}
+
+const checkoutSelected = async () => {
+  if (selectedIds.value.length === 0) {
+    showError('Pilih minimal satu produk untuk checkout')
+    return
+  }
+
+  try {
+    const confirmed = await showConfirm('Yakin ingin checkout produk terpilih?')
+    if (!confirmed) return
+
+    const response = await api.post('/checkout/products', {
+      cart_detail_ids: selectedIds.value
+    })
+
+    showSuccess('Checkout berhasil!')
+    router.push('/checkout/' + response.data.data.kode_transaksi)
+  } catch (error) {
+    showError('Checkout gagal, coba lagi.')
+    console.error(error)
   }
 }
 
 onMounted(async () => {
-  await getAllProducts()
   await getCart()
 })
 </script>
-
-<style scoped>
-@media (min-width: 768px) {
-  /* Supaya card tetap sempit di desktop */
-  .container {
-    max-width: 480px;
-    margin: 0 auto;
-  }
-}
-</style>

@@ -2,24 +2,48 @@
   <Navbar />
 
   <div class="flex justify-center items-start min-h-screen bg-gray-100 py-10 px-4">
+
+    <!-- Skeleton -->
+    <div v-if="isLoading"
+    class="w-full max-w-md bg-white p-6 rounded-2xl shadow-lg space-y-5">
+
+      <div class="flex justify-center">
+        <Skeleton type="circle" size="96px"/>
+      </div>
+
+      <Skeleton height="18px" width="40%" class="mx-auto"/>
+
+      <Skeleton height="40px"/>
+      <Skeleton height="40px"/>
+      <Skeleton height="40px"/>
+      <Skeleton height="40px"/>
+
+      <Skeleton height="40px"/>
+
+    </div>
+
+
+    <!-- Form Asli -->
     <form
+      v-else
       @submit.prevent="updateProfile"
       class="w-full max-w-md bg-white p-6 rounded-2xl shadow-lg space-y-5"
     >
+
       <h2 class="text-2xl font-bold text-center text-gray-700">Edit Profil</h2>
 
       <!-- Foto Profil -->
       <div class="text-center">
         <img
-          :src="previewImage || user?.foto_profil || 'https://via.placeholder.com/100'"
+          :src="previewImage || user?.foto_profil || 'https://placehold.co/100'"
           class="w-24 h-24 mx-auto rounded-full object-cover mb-3 border-2 border-yellow-500"
-          alt="Foto Profil"
         />
+
         <input
-            type="file"
-            @change="onFileChange"
-            accept="image/*"
-            class="block mx-auto text-sm text-gray-600 mt-2 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-yellow-500 file:text-white hover:file:bg-yellow-600 transition"
+          type="file"
+          @change="onFileChange"
+          accept="image/*"
+          class="block mx-auto text-sm text-gray-600 mt-2"
         />
       </div>
 
@@ -29,8 +53,7 @@
         <input
           type="text"
           v-model="form.name"
-          placeholder="Masukkan nama"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 placeholder-gray-400 transition"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
         />
       </div>
 
@@ -40,8 +63,7 @@
         <input
           type="email"
           v-model="form.email"
-          placeholder="Masukkan email"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 placeholder-gray-400 transition"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
         />
       </div>
 
@@ -51,8 +73,7 @@
         <input
           type="text"
           v-model="form.no_telp"
-          placeholder="08xxxxxxxxxx"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 placeholder-gray-400 transition"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
         />
       </div>
 
@@ -62,27 +83,29 @@
         <input
           type="password"
           v-model="form.password"
-          placeholder="Isi jika ingin mengganti"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 placeholder-gray-400 transition"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
         />
       </div>
 
-      <!-- Tombol Simpan -->
       <button
         type="submit"
         :disabled="isLoading"
-        class="w-full bg-yellow-500 text-white font-semibold py-2 rounded-lg hover:bg-yellow-600 transition disabled:opacity-50"
+        class="w-full bg-yellow-500 text-white font-semibold py-2 rounded-lg"
       >
-        {{ isLoading ? 'Menyimpan...' : 'Simpan Perubahan' }}
+        Simpan Perubahan
       </button>
+
     </form>
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import Navbar from '@/components/navbar/navbar.vue';
+import Skeleton from "@/components/Skeleton.vue"
 import api from '@/plugins/axios';
+import { showError, showSuccess } from '@/utils/alert';
 
 const user = ref(null);
 const form = ref({
@@ -141,11 +164,20 @@ const updateProfile = async () => {
       },
     });
 
-    alert('Profil berhasil diperbarui');
+    showSuccess('Profil berhasil diperbarui');
     getProfile();
   } catch (error) {
     console.error('Gagal update profil:', error);
-    alert('Gagal update profil');
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+
+  showError(errorMessage);
+    
   } finally {
     isLoading.value = false;
   }

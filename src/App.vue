@@ -1,13 +1,13 @@
 <template>
-  <router-view />
+  <router-view :key="$route.fullPath" />
 </template>
 
 
 <script>
-import Index from './views/index.vue';
+import dashboard from './views/dashboard.vue';
 export default {
   components: {
-    Index
+    dashboard
   }
 };
 </script>

@@ -1,41 +1,79 @@
 <template>
   <Sellerside>
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded overflow-x-hidden">
+      <!-- LOADING -->
+      <template v-if="isLoading">
         <h2 class="text-xl font-bold mb-4">Form Tambah Produk</h2>
+        <div class="space-y-4">
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="40px"/>
+          </div>
+
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="80px"/>
+          </div>
+
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="40px"/>
+          </div>
+
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="40px"/>
+          </div>
+
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="40px"/>
+          </div>
+
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="40px"/>
+          </div>
+
+          <Skeleton height="60px"/>
+          <Skeleton width="120px" height="40px"/>
+        </div>
+      </template>
+
+      <!-- FORM -->
+      <template v-else>
+        <h2 class="text-xl font-bold mb-4">Form Update Produk</h2>
         <form @submit.prevent="submitForm">
+
           <div class="mb-4">
-            <label for="nama_product" class="block mb-1">Nama Produk</label>
+            <label class="block mb-1">Nama Produk</label>
             <input
-              id="nama_product"
               v-model="form.nama_product"
               type="text"
               class="w-full border px-3 py-2 rounded"
             />
           </div>
-  
+
           <div class="mb-4">
-            <label for="deskripsi" class="block mb-1">Deskripsi</label>
+            <label class="block mb-1">Deskripsi</label>
             <textarea
-              id="deskripsi"
               v-model="form.deskripsi"
               class="w-full border px-3 py-2 rounded"
             ></textarea>
           </div>
-  
+
           <div class="mb-4">
-            <label for="harga" class="block mb-1">Harga</label>
+            <label class="block mb-1">Harga</label>
             <input
-              id="harga"
               v-model="form.harga"
               type="text"
               class="w-full border px-3 py-2 rounded"
             />
           </div>
-  
+
           <div class="mb-4">
-            <label for="stock" class="block mb-1">Stok</label>
+            <label class="block mb-1">Stok</label>
             <input
-              id="stock"
               v-model="form.stock"
               type="number"
               class="w-full border px-3 py-2 rounded"
@@ -43,55 +81,38 @@
           </div>
 
           <div class="mb-4">
-            <label for="berat" class="block mb-1">Berat</label>
+            <label class="block mb-1">Berat</label>
             <input
-            id="berat"
-            v-model="form.berat"
-            type="number"
-            class="w-full border px-3 py-2 rounded"
+              v-model="form.berat"
+              type="number"
+              class="w-full border px-3 py-2 rounded"
             />
           </div>
 
           <div class="mb-4">
-            <label for="status" class="block mb-1">Status Produk</label>
+            <label class="block mb-1">Status Produk</label>
             <select
-                id="status"
-                v-model="form.status"
-                class="w-full border px-3 py-2 rounded"
+              v-model="form.status"
+              class="w-full border px-3 py-2 rounded"
             >
-                <option value="">Pilih status</option>
-                <option value="draft">Draft</option>
-                <option value="publish">Publish</option>
+              <option value="">Pilih status</option>
+              <option value="draft">Draft</option>
+              <option value="publish">Publish</option>
             </select>
           </div>
-  
+
           <div class="mb-4">
             <label
               for="foto_cover"
-              class="block rounded border border-gray-300 p-4 text-gray-900 shadow-sm sm:p-6 cursor-pointer"
+              class="block rounded border border-gray-300 p-4 cursor-pointer"
             >
               <div class="flex items-center justify-center gap-4">
+
                 <span class="font-medium">Upload Foto Produk</span>
+
                 <div v-if="selectedFileName" class="text-sm text-gray-500 truncate w-full max-w-xs">
-                    {{ selectedFileName }}
-                    </div>
-
-
-
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="size-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M7.5 7.5h-.75A2.25 2.25 0 0 0 4.5 9.75v7.5a2.25 2.25 0 0 0 2.25 2.25h7.5a2.25 2.25 0 0 0 2.25-2.25v-7.5a2.25 2.25 0 0 0-2.25-2.25h-.75m0-3-3-3m0 0-3 3m3-3v11.25m6-2.25h.75a2.25 2.25 0 0 1 2.25 2.25v7.5a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-.75"
-                  />
-                </svg>
+                  {{ selectedFileName }}
+                </div>
               </div>
               <input
                 id="foto_cover"
@@ -102,15 +123,17 @@
               />
             </label>
           </div>
-  
+
           <button
             type="submit"
             class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
-            Submit
+            Update
           </button>
+
         </form>
-      </div>
+      </template>
+    </div>
   </Sellerside>
 </template>
 
@@ -119,6 +142,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/plugins/axios'
 import Sellerside from '@/components/navbar/seller-side.vue'
+import Skeleton from '@/components/Skeleton.vue'
+import { showError, showSuccess } from '@/utils/alert'
 
 const route = useRoute()
 const router = useRouter()
@@ -157,7 +182,7 @@ const fetchProduct = async () => {
     selectedFileName.value = product.foto_cover || 'Tidak ada file';
   } catch (error) {
     console.error('Gagal mengambil data produk:', error);
-    alert('Gagal mengambil data produk.');
+    showError('Gagal mengambil data produk.');
   } finally {
     isLoading.value = false;
   }
@@ -177,6 +202,7 @@ const submitForm = async () => {
       formData.append('foto_cover', form.value.foto_cover);  
     }
 
+    formData.append('_method', 'PUT');
 
     await api.post(`/product/${route.params.id}`, formData, {
       headers: {
@@ -184,11 +210,18 @@ const submitForm = async () => {
       },
     });
 
-    alert('Produk berhasil diperbarui!');
-    router.push('/manageproduk');  
+    showSuccess('Produk berhasil diperbarui!');
+    router.push('/manage-produk');  
   } catch (error) {
-    console.error('Gagal submit form:', error);
-    alert(error.response?.data?.message || 'Gagal mengubah produk.');
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+
+    showError(errorMessage);
   }
 };
 

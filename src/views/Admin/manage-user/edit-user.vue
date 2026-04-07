@@ -1,81 +1,119 @@
 <template>
-    <adminside>
-      <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
-        <h2 class="text-xl font-bold mb-4">Form Edit User</h2>
-        <form @submit.prevent="submitForm">
-          <div class="mb-4">
-            <label for="name" class="block mb-1">Name</label>
-            <input
-              id="name"
-              name="name"
-              v-model="form.name"
-              type="text"
-              class="w-full border px-3 py-2 rounded"
-            />
-          </div>
-  
-          <div class="mb-4">
-            <label for="email" class="block mb-1">Email</label>
-            <input
-              id="email"
-              name="email"
-              v-model="form.email"
-              type="email"
-              class="w-full border px-3 py-2 rounded"
-            />
-          </div>
-  
-          <div class="mb-4">
-            <label for="password" class="block mb-1">Password</label>
-            <input
-              id="password"
-              name="password"
-              v-model="form.password"
-              type="password"
-              class="w-full border px-3 py-2 rounded"
-            />
-          </div>
-  
-          <div class="mb-4">
-            <label for="no_telp" class="block mb-1">No. Telepon</label>
-            <input
-              id="no_telp"
-              name="no_telp"
-              v-model="form.no_telp"
-              type="text"
-              class="w-full border px-3 py-2 rounded"
-            />
-          </div>
-  
-          <div class="mb-4">
-            <label for="role_id" class="block mb-1">Role</label>
-            <select
-              id="role_id"
-              name="role_id"
-              v-model="form.role_id"
-              class="w-full border px-3 py-2 rounded text-black bg-white"
+  <adminside>
+    <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
+      <!-- Judul -->
+      <h2 class="text-xl font-bold mb-4">Form Edit User</h2>
+      <!-- Skeleton Form -->
+      <div v-if="isLoading" class="space-y-4">
+        <div>
+          <Skeleton height="14px" width="30%" class="mb-2"/>
+          <Skeleton height="38px"/>
+        </div>
+
+        <div>
+          <Skeleton height="14px" width="30%" class="mb-2"/>
+          <Skeleton height="38px"/>
+        </div>
+
+        <div>
+          <Skeleton height="14px" width="30%" class="mb-2"/>
+          <Skeleton height="38px"/>
+        </div>
+
+        <div>
+          <Skeleton height="14px" width="30%" class="mb-2"/>
+          <Skeleton height="38px"/>
+        </div>
+
+        <div>
+          <Skeleton height="14px" width="30%" class="mb-2"/>
+          <Skeleton height="38px"/>
+        </div>
+
+        <Skeleton height="80px"/>
+
+        <Skeleton height="40px" width="100px"/>
+      </div>
+
+      <!-- Form Asli -->
+      <form v-else @submit.prevent="submitForm">
+        <div class="mb-4">
+          <label for="name" class="block mb-1">Name</label>
+          <input
+            id="name"
+            name="name"
+            v-model="form.name"
+            type="text"
+            class="w-full border px-3 py-2 rounded"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="email" class="block mb-1">Email</label>
+          <input
+            id="email"
+            name="email"
+            v-model="form.email"
+            type="email"
+            class="w-full border px-3 py-2 rounded"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="block mb-1">Password</label>
+          <input
+            id="password"
+            name="password"
+            v-model="form.password"
+            type="password"
+            class="w-full border px-3 py-2 rounded"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="no_telp" class="block mb-1">No. Telepon</label>
+          <input
+            id="no_telp"
+            name="no_telp"
+            v-model="form.no_telp"
+            type="text"
+            class="w-full border px-3 py-2 rounded"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="role_id" class="block mb-1">Role</label>
+
+          <select
+            id="role_id"
+            name="role_id"
+            v-model="form.role_id"
+            class="w-full border px-3 py-2 rounded text-black bg-white"
+          >
+            <option disabled value="">Pilih Role</option>
+
+            <option
+              v-for="role in roleIds"
+              :key="role.id"
+              :value="role.id"
             >
-              <option disabled value="">Pilih Role</option>
-              <option
-                v-for="role in roleIds"
-                :key="role.id"
-                :value="role.id"
-                class="text-black"
-              >
-                {{ role.name }}
-              </option>
-            </select>
-          </div>
-  
-          <div class="mb-4">
-          <label for="foto_profil" class="block rounded border border-gray-300 p-4 text-gray-900 shadow-sm sm:p-6 cursor-pointer">
+              {{ role.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label
+            for="foto_profil"
+            class="block rounded border border-gray-300 p-4 text-gray-900 shadow-sm sm:p-6 cursor-pointer"
+          >
             <div class="flex items-center justify-center gap-4">
               <span class="font-medium">Upload Foto Profil</span>
+
               <div v-if="selectedFileName" class="text-sm text-gray-500">
                 {{ selectedFileName }}
               </div>
 
-          
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -91,6 +129,7 @@
                 />
               </svg>
             </div>
+
             <input
               id="foto_profil"
               name="foto_profil"
@@ -101,23 +140,25 @@
             />
           </label>
         </div>
-  
-          <button
-            type="submit"
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Submit
-          </button>
-        </form>
-      </div>
-    </adminside>
-  </template>
+
+        <button
+          type="submit"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Submit
+        </button>
+      </form>
+    </div>
+  </adminside>
+</template>
   
   <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/plugins/axios'
 import adminside from '@/components/navbar/admin-side.vue'
+import Skeleton from '@/components/Skeleton.vue'
+import { showError, showSuccess } from '@/utils/alert'
 
 const route = useRoute()
 const router = useRouter()
@@ -168,7 +209,7 @@ const fetchUser = async () => {
     form.value.role_id = user.role_id;
   } catch (error) {
     console.error('Gagal mengambil data user:', error);
-    alert('Gagal mengambil data user.');
+    showError('Gagal mengambil data user.');
   } finally {
     isLoading.value = false;
   }
@@ -193,11 +234,18 @@ const submitForm = async () => {
       },
     });
 
-    alert('User berhasil diperbarui!');
-    router.push('/manageuser');
+    showSuccess('User berhasil diperbarui!');
+    router.push('/manage-user');
   } catch (error) {
-    console.error('Gagal submit form:', error);
-    alert(error.response?.data?.message || 'Gagal mengubah User.');
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+
+    showError(errorMessage);
   }
 };
 

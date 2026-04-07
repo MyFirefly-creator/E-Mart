@@ -4,9 +4,14 @@
       
       <!-- Carousel Image (desktop only) -->
       <div v-if="isDesktop" class="relative w-full md:w-1/2 bg-[#f5f5f5] flex justify-center items-center p-4">
-        <div class="w-11/12">
-          <img :src="images[currentImage]" class="w-full rounded-lg" alt="Carousel Image" />
-        </div>
+        <div class="w-11/12 h-[500px] bg-gray-100 flex items-center justify-center rounded-lg overflow-hidden">
+          <img
+            v-if="images.length"
+            :src="images[currentImage]"
+            class="max-w-full max-h-full object-contain rounded-lg"
+            @error="(e) => e.target.src = 'https://placehold.co/800x800/7D0A0A/FFF?text=Space Available'"
+          />
+        </div>  
       </div>
 
       <!-- Login Form -->
@@ -41,21 +46,12 @@
           >
             Don't Have an Account? Register
           </router-link>
-
-          <p class="mt-4 inter-font">Or Login With</p>
-
-          <button
-            type="button"
-            class="w-full p-3 mt-2 bg-white text-[#7D0A0A] rounded flex justify-center items-center gap-2 hover:bg-gray-100 transition oswald-font"
+          <router-link
+            to="/forget-password"
+            class="block text-[#EAD196] underline mt-2 inter-font"
           >
-            <i class="fab fa-google"></i> Google
-          </button>
-          <button
-            type="button"
-            class="w-full p-3 mt-2 bg-white text-[#7D0A0A] rounded flex justify-center items-center gap-2 hover:bg-gray-100 transition oswald-font"
-          >
-            <i class="fab fa-facebook-f"></i> Facebook
-          </button>
+            Forgot Password 
+          </router-link>
         </form>
       </div>
     </div>
@@ -66,18 +62,14 @@
 import api from "@/plugins/axios";
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
+import { showError } from "@/utils/alert"; 
 
 const router = useRouter();
 const form = ref({ email: "", password: "" });
-const images = ref([
-  "https://placehold.co/400x500",
-  "https://placehold.co/400x500/7D0A0A/FFF",
-  "https://placehold.co/400x500/EAD196/000",
-]);
+const images = ref([])
 const currentImage = ref(0);
 const isDesktop = ref(window.innerWidth >= 768);
 const loading = ref(false);
-const errorMessage = ref("");
 let interval = null;
 
 const nextImage = () => {
@@ -90,7 +82,6 @@ const checkScreen = () => {
 
 const loginUser = async () => {
   loading.value = true;
-  errorMessage.value = "";
   try {
     const response = await api.post("/auth/login", form.value);
     if (response.data?.data?.access_token) {
@@ -101,17 +92,37 @@ const loginUser = async () => {
       throw new Error("Token tidak ditemukan");
     }
   } catch (error) {
-    errorMessage.value = error.response?.data?.message || "Login gagal";
-    alert(errorMessage.value);
+    const message = "Login gagal / Email atau Password salah";
+    showError(message); 
   } finally {
     loading.value = false;
   }
 };
 
+const getBannerLogin = async () => {
+  try {
+    const response = await api.get("/content?section=login")
+    const data = response.data?.data || []
+    const fetchedImages = data.map(item => item.image)
+    
+    if (fetchedImages.length > 0) {
+      images.value = fetchedImages
+    } else {
+      images.value = ['https://placehold.co/800x800/7D0A0A/FFF?text=Space Available']
+    }
+
+    console.log("Images:", images.value)
+  } catch (error) {
+    console.error("Error fetching login banners:", error)
+    images.value = ['https://placehold.co/800x800/7D0A0A/FFF?text=Space Available']
+  }
+}
+
 onMounted(() => {
-  interval = setInterval(nextImage, 3000);
-  window.addEventListener("resize", checkScreen);
-});
+  interval = setInterval(nextImage, 3000)
+  window.addEventListener("resize", checkScreen)
+  getBannerLogin()
+})
 
 onUnmounted(() => {
   clearInterval(interval);

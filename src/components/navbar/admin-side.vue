@@ -19,11 +19,8 @@
           <li>
             <router-link
               to="/admin"
-              :class="{
-                'bg-[#7D0A0A]': $route.path !== '/admin',
-                'bg-[#5E0A0A]': $route.path === '/admin'
-              }"
-              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A]"
+              :class="linkClass('/admin')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
             >
               Home
             </router-link>
@@ -32,39 +29,60 @@
           <li>
             <router-link
               to="/manage-user"
-              :class="{
-                'bg-[#7D0A0A]': $route.path !== '/manage-user',
-                'bg-[#5E0A0A]': $route.path === '/manage-user'
-              }"
-              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A]"
+              :class="linkClass('/manage-user')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
             >
               Manage User
             </router-link>
           </li>
 
-          <!-- <li>
-            <router-link
-              to="/role"
-              :class="{
-                'bg-[#7D0A0A]': $route.path !== '/role',
-                'bg-[#5E0A0A]': $route.path === '/role'
-              }"
-              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A]"
-            >
-              Manage Role
-            </router-link>
-          </li> -->
-
           <li>
             <router-link
               to="/kategori"
-              :class="{
-                'bg-[#7D0A0A]': $route.path !== '/kategori',
-                'bg-[#5E0A0A]': $route.path === '/kategori'
-              }"
-              class="block rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-[#7D0A0A]"
+              :class="linkClass('/kategori')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
             >
-              Manage kategori
+              Manage Kategori
+            </router-link>
+          </li>
+
+          <li>
+            <router-link
+              to="/manage-request"
+              :class="linkClass('/manage-request')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
+            >
+              Manage Request Seller
+            </router-link>
+          </li>
+
+          <li>
+            <router-link
+              to="/settings-admin"
+              :class="linkClass('/settings-admin')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
+            >
+              Manage Setting Admin
+            </router-link>
+          </li>
+
+          <li>
+            <router-link
+              to="/manage-income"
+              :class="linkClass('/manage-income')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
+            >
+              Manage Income
+            </router-link>
+          </li>
+
+          <li>
+            <router-link
+              to="/manage-banner"
+              :class="linkClass('/manage-banner')"
+              class="block rounded-lg px-4 py-2 text-sm font-medium navbar-font mb-6"
+            >
+              Manage Banner
             </router-link>
           </li>
 
@@ -76,22 +94,6 @@
           </button>
 
         </ul>
-      </div>
-
-      <div class="sticky inset-x-0 bottom-0 border-t border-gray-100 bg-[#7D0A0A]">
-        <a href="#" class="flex items-center gap-2 p-4 hover:bg-BF3131">
-          <img
-            alt=""
-            src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1770&q=80"
-            class="size-10 rounded-full object-cover"
-          />
-          <div>
-            <p class="text-xs">
-              <strong class="block font-medium text-white">{{ email }}</strong>
-              <span class="text-white">{{ userName }}</span>
-            </p>
-          </div>
-        </a>
       </div>
     </div>
 
@@ -113,35 +115,48 @@
 import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
 import { useRouter } from 'vue-router'
+import { showConfirm, showError, showSuccess } from '@/utils/alert'
 
 const router = useRouter()
 const userName = ref('')
 const email = ref('')
+const userRole = ref('')
 const isSidebarOpen = ref(false)
 
+function linkClass(path) {
+  return [
+    'text-white',
+    router.currentRoute.value.path === path ? 'bg-[#5E0A0A]' : 'bg-[#7D0A0A] hover:bg-[#A61D1D]',
+  ]
+}
+
 const logout = async () => {
-  const confirmed = window.confirm("Are you sure you want to log out?")
+  const confirmed = await showConfirm("Anda Yakin Mau Logout ?")
   if (!confirmed) return
 
   try {
     await api.post('/auth/logout')
     localStorage.removeItem("token")
     router.push('/login')
-    alert('Logged out successfully!')
+    showSuccess("Logout Berhasil")
   } catch (error) {
     console.error('Logout failed:', error)
-    alert('Logout failed, please try again.')
+    showError('Gagal Untuk Logout.')
   }
 }
-
 
 onMounted(async () => {
   try {
     const response = await api.get('/profile')
     userName.value = response.data.data.name
     email.value = response.data.data.email
+    userRole.value = response.data.data.nama_role
+
+    if (userRole.value === 'seller' || userRole.value === 'buyer') {
+      router.push('/dashboard')
+    }
   } catch (error) {
-    console.log('User not logged in')
+    router.push('/login')
   }
 })
 

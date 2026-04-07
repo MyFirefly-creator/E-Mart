@@ -125,6 +125,7 @@ import { ref, onMounted } from 'vue'
 import api from '@/plugins/axios'
 import adminside from '@/components/navbar/admin-side.vue'
 import { useRouter } from 'vue-router'
+import { showSuccess,showError } from '@/utils/alert'
 
 const router = useRouter()
 const form = ref({
@@ -184,14 +185,20 @@ const submitForm = async () => {
       },
     })
 
-    alert('User berhasil ditambahkan!')
+    showSuccess('User berhasil ditambahkan!')
     console.log('Response:', response.data)
 
     router.push('/manageUser') 
   } catch (error) {
-    console.error('Gagal submit form:', error)
-    console.error('Detail error:', error.response?.data || error)
-    alert(error.response?.data?.message || 'Gagal menambahkan user.')
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+
+    showError(errorMessage);
   }
 }
 

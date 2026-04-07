@@ -1,7 +1,19 @@
 <template>
   <sellerside>
     <div class="p-6 overflow-x-auto">
-        <h1 class="text-3xl font-bold mb-6">Manage Foto Produk</h1>
+        
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-3xl font-bold">Manage Foto Produk</h1>
+
+          <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
+            <div class="flex-1">
+              <p class="text-sm font-bold">{{ user.name }}</p>
+              <p class="text-xs text-gray-600">{{ user.email }}</p>
+            </div>
+            <img :src="user?.foto_profil || 'https://placehold.co/100'" class="w-10 h-10 bg-gray-300 rounded-full" />
+          </div>
+        </div>
+
         <router-link
           class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 focus:ring-2 focus:ring-[#BF3131] focus:outline-none mb-5 ml-2"
           to="/create-foto-product"
@@ -38,7 +50,6 @@
             <tr>
                 <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Nama</th>
                 <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Foto</th>
-                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Action</th>
 
             </tr>
             </thead>
@@ -83,6 +94,32 @@
             </tr>
             </tbody>
             </table>
+              <div class="flex justify-center mt-4 space-x-2 mb-4">
+                <button
+                  @click="changePage(currentPage - 1)"
+                  :disabled="currentPage === 1"
+                  class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+                >
+                  Previous
+                </button>
+
+                <button
+                  v-for="page in lastPage"
+                  :key="page"
+                  @click="changePage(page)"
+                  :class="['px-3 py-1 rounded', page === currentPage ? 'bg-[#7D0A0A] text-white' : 'bg-gray-200 text-gray-700']"
+                >
+                  {{ page }}
+                </button>
+
+                <button
+                  @click="changePage(currentPage + 1)"
+                  :disabled="currentPage === lastPage"
+                  class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
         </div>
       </div>
   </sellerside>
@@ -90,64 +127,65 @@
 
 <script setup>
 import Sellerside from '@/components/navbar/seller-side.vue';
-
 import api from "@/plugins/axios";
-import { ref, onMounted, onUnmounted } from "vue";
+import { showError, showSuccess, showConfirm } from '@/utils/alert';
+import { ref, onMounted } from "vue";
 
-const product = ref([]);
-const user = ref({})
+const user = ref({});
 const ProductSeller = ref([]);
-const openMenuIndex = ref(null)
+const openMenuIndex = ref(null);
+
+const currentPage = ref(1);
+const lastPage = ref(1);
 
 const toggleMenu = (produkId, fotoIndex) => {
   const id = `${produkId}-${fotoIndex}`;
-  if (openMenuIndex.value === id) {
-    openMenuIndex.value = null;
-  } else {
-    openMenuIndex.value = id;
-  }
+  openMenuIndex.value = openMenuIndex.value === id ? null : id;
 };
 
 const deleteFoto = async (id) => {
-  const konfirmasi = confirm('Yakin ingin menghapus Foto Ini?');
+  const konfirmasi = await showConfirm('Yakin ingin menghapus Foto Ini?');
   if (!konfirmasi) return;
 
   try {
     await api.delete(`/foto/${id}`);
-    alert('Foto berhasil dihapus.');
-    await getProduct(); 
+    showSuccess('Foto berhasil dihapus.');
+    await getProduct(currentPage.value);
   } catch (error) {
     console.error('Gagal Menghapus Foto:', error);
-    alert('Gagal menghapus foto.');
+    showError('Gagal menghapus foto.');
   }
 };
 
 const getProfile = async () => {
-    try {
-      const response = await api.get('/profile')
-      user.value = response.data.data 
-    } catch (error) {
-      console.error('Gagal mengambil profil:', error)
-    }
-  }
-
-  const getProduct = async () => {
   try {
-    const response = await api.get('/product');
-    if (Array.isArray(response.data.data.data)) {
-      product.value = response.data.data.data;
-      ProductSeller.value = product.value.filter(p => p.user_id === user.value.id);
-    } else {
-      console.error("Data Produk tidak berupa array:", response.data.data.data);
-    }
+    const response = await api.get('/profile');
+    user.value = response.data.data;
+  } catch (error) {
+    console.error('Gagal mengambil profil:', error);
+  }
+};
+
+const getProduct = async (page = 1) => {
+  try {
+    const response = await api.get(`/product/myproducts?page=${page}`);
+    ProductSeller.value = response.data.data.data;
+    console.log(ProductSeller.value);
+    currentPage.value = response.data.data.current_page;
+    lastPage.value = response.data.data.last_page;
   } catch (error) {
     console.error('Error fetching product:', error);
   }
 };
 
+const changePage = async (page) => {
+  if (page < 1 || page > lastPage.value) return;
+  await getProduct(page);
+};
+
 onMounted(async () => {
-  await getProfile(); 
-  await getProduct(); 
+  await getProfile();
+  await getProduct();
 });
 </script>
 

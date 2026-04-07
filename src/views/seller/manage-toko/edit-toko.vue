@@ -1,163 +1,183 @@
 <template>
   <sellerside>
     <div class="max-w-md mx-auto p-4 bg-white shadow rounded">
+
+      <!-- SKELETON -->
+      <template v-if="isLoading">
         <h2 class="text-xl font-bold mb-4">Form Edit Toko</h2>
+
+        <div class="space-y-4">
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="38px"/>
+          </div>
+
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="38px"/>
+          </div>
+
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="38px"/>
+          </div>
+
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="38px"/>
+          </div>
+
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="38px"/>
+          </div>
+
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="38px"/>
+          </div>
+
+          <div>
+            <Skeleton width="120px" height="14px" class="mb-2"/>
+            <Skeleton height="60px"/>
+          </div>
+
+          <Skeleton width="140px" height="40px"/>
+        </div>
+      </template>
+
+      <!-- FORM -->
+      <template v-else>
+        <h2 class="text-xl font-bold mb-4">Form Edit Toko</h2>
+
         <form @submit.prevent="submitForm">
-            <div class="mb-4">
-                <label for="nama_toko" class="block mb-1">Nama Toko</label>
-                <input 
-                type="text"
-                id="nama_toko"
-                v-model="form.nama_toko"
-                class="w-full border px-3 py-2 rounded"
-                />
-            </div>
+          <div class="mb-4">
+            <label for="nama_toko" class="block mb-1">Nama Toko</label>
+            <input
+              id="nama_toko"
+              v-model="form.nama_toko"
+              type="text"
+              class="w-full border px-3 py-2 rounded"
+            />
+          </div>
 
-            <div class="mb-4">
-                <label for="deskripsi" class="block mb-1">Deskripsi</label>
-                <input 
-                type="text"
-                id="deskripsi"
-                v-model="form.deskripsi"
-                class="w-full border px-3 py-2 rounded"
-                />
-            </div>
+          <div class="mb-4">
+            <label for="deskripsi" class="block mb-1">Deskripsi</label>
+            <input
+              id="deskripsi"
+              v-model="form.deskripsi"
+              type="text"
+              class="w-full border px-3 py-2 rounded"
+            />
+          </div>
 
-            <div class="mb-4">
-                <label for="no_telp" class="block mb-1">No Telepon</label>
-                <input 
-                type="text"
-                id="no_telp"
-                v-model="form.no_telp"
-                class="w-full border px-3 py-2 rounded"
-                />
-            </div>
+          <div class="mb-4">
+            <label for="no_telp" class="block mb-1">No Telepon</label>
+            <input
+              id="no_telp"
+              v-model="form.no_telp"
+              type="text"
+              class="w-full border px-3 py-2 rounded"
+            />
+          </div>
 
-             <div class="mb-4">
-                <label class="block mb-1">Provinsi</label>
-                <select
-                    v-model="form.province_id" 
-                    @change="getKota" 
-                    class="w-full border px-3 py-2 rounded"
-                >
-                    <option disabled value="">Pilih Provinsi</option>
-                    <option
-                    v-for="prov in provinces"
-                    :key="prov.id"
-                    :value="prov.id" 
-                    >
-                    {{ prov.name }} 
-                    </option>
-                </select>
-            </div>
+          <div class="mb-4">
+            <label class="block mb-1">Provinsi</label>
+            <select
+              v-model="form.province_id"
+              @change="getKota"
+              class="w-full border px-3 py-2 rounded"
+            >
+              <option disabled value="">Pilih Provinsi</option>
+              <option v-for="prov in provinces" :key="prov.id" :value="prov.id">
+                {{ prov.name }}
+              </option>
+            </select>
+          </div>
 
-                <div class="mb-4">
-                <label for="city_name" class="block mb-1">Kota / Kabupaten</label>
-                <select
-                    id="city_name"
-                    v-model="form.city_name"
-                    @change="getKecamatan"
-                    class="w-full border px-3 py-2 rounded"
-                    required
-                >
-                    <option value="" disabled selected>Pilih Kota</option>
-                    <option v-for="city in cities" :key="city.id" :value="city.name">
-                    {{ city.name }}
-                    </option>
-                </select>
-                </div>
+          <div class="mb-4">
+            <label class="block mb-1">Kota / Kabupaten</label>
+            <select
+              v-model="form.city_name"
+              @change="getKecamatan"
+              class="w-full border px-3 py-2 rounded"
+            >
+              <option value="" disabled>Pilih Kota</option>
+              <option v-for="city in cities" :key="city.id" :value="city.name">
+                {{ city.name }}
+              </option>
+            </select>
+          </div>
 
-                <div class="mb-4">
-                <label for="district_name" class="block mb-1">Kecamatan</label>
-                <select
-                    id="district_name"
-                    v-model="form.district_name"
-                    @change="getKelurahan"
-                    class="w-full border px-3 py-2 rounded"
-                    required
-                >
-                    <option value="" disabled selected>Pilih Kecamatan</option>
-                    <option v-for="district in districts" :key="district.id" :value="district.name">
-                    {{ district.name }}
-                    </option>
-                </select>
-                </div>
+          <div class="mb-4">
+            <label class="block mb-1">Kecamatan</label>
+            <select
+              v-model="form.district_name"
+              @change="getKelurahan"
+              class="w-full border px-3 py-2 rounded"
+            >
+              <option value="" disabled>Pilih Kecamatan</option>
+              <option v-for="district in districts" :key="district.id" :value="district.name">
+                {{ district.name }}
+              </option>
+            </select>
+          </div>
 
-                <div class="mb-4">
-                <label for="subdistrict_name" class="block mb-1">Kelurahan</label>
-                <select
-                    id="subdistrict_name"
-                    v-model="form.subdistrict_name"
-                    class="w-full border px-3 py-2 rounded"
-                    required
-                >
-                    <option value="" disabled selected>Pilih Kelurahan</option>
-                    <option v-for="sub in subdistricts" :key="sub.id" :value="sub.name">
-                    {{ sub.name }}
-                    </option>
-                </select>
-                </div>
+          <div class="mb-4">
+            <label class="block mb-1">Kelurahan</label>
+            <select
+              v-model="form.subdistrict_name"
+              class="w-full border px-3 py-2 rounded"
+            >
+              <option value="" disabled>Pilih Kelurahan</option>
+              <option v-for="sub in subdistricts" :key="sub.id" :value="sub.name">
+                {{ sub.name }}
+              </option>
+            </select>
+          </div>
 
-                <div class="mb-4">
-                <label for="zip_code" class="block mb-1">Kode Pos</label>
-                <input
-                    type="text"
-                    id="zip_code"
-                    v-model="form.zip_code"
-                    class="w-full border px-3 py-2 rounded"
-                    required
-                />
-                </div>
+          <div v-if="searchResults.length" class="border rounded p-3 max-h-48 overflow-auto mt-3 bg-gray-50">
+            <p class="mb-2 font-semibold">Pilih alamat yang sesuai:</p>
 
-                <div class="mb-4">
-                <label for="detail_alamat" class="block mb-1">Detail Alamat (Jalan, RT/RW, dsb)</label>
-                <textarea
-                    id="detail_alamat"
-                    v-model="form.detail_alamat"
-                    class="w-full border px-3 py-2 rounded"
-                    rows="2"
-                    required
-                ></textarea>
-                </div>
+            <ul>
+              <li
+                v-for="item in searchResults"
+                :key="item.id"
+                class="cursor-pointer p-2 hover:bg-gray-200 rounded"
+                @click="pilihAlamat(item)"
+              >
+                {{ item.label }}
+              </li>
+            </ul>
+          </div>
 
-                <div class="mb-4 flex items-center space-x-2">
-                <button
-                    type="button"
-                    @click="cariKodeDomestik"
-                    class="bg-yellow-600 text-white px-3 py-2 rounded hover:bg-yellow-700"
-                >
-                    Cari Kode Domestik
-                </button>
-                <span class="text-sm text-gray-700" v-if="form.kode_domestik">
-                    Kode: {{ form.kode_domestik }}
-                </span>
-                </div>
+          <div class="mb-4">
+            <label class="block mb-1">Kode Pos</label>
+            <input
+              v-model="form.zip_code"
+              type="text"
+              class="w-full border px-3 py-2 rounded"
+            />
+          </div>
 
-                <div v-if="searchResults.length" class="mb-4">
-                <label for="selectedAlamat" class="block mb-1 font-semibold">Pilih Kode Domestik</label>
-                <select
-                    id="selectedAlamat"
-                    class="w-full border px-3 py-2 rounded"
-                    @change="pilihAlamatDariDropdown($event)"
-                >
-                    <option value="" disabled selected>Pilih salah satu alamat</option>
-                    <option
-                    v-for="item in searchResults"
-                    :key="item.id"
-                    :value="JSON.stringify(item)"
-                    >
-                    {{ item.label }}
-                    </option>
-                </select>
-                </div>
+          <div class="mb-4">
+            <label class="block mb-1">Detail Alamat</label>
+            <textarea
+              v-model="form.detail_alamat"
+              rows="2"
+              class="w-full border px-3 py-2 rounded"
+            ></textarea>
+          </div>
 
-            <button
-          type="submit"
-          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Submit
-        </button>
+          <button
+            type="submit"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Submit
+          </button>
         </form>
+      </template>
+
     </div>
   </sellerside>
 </template>
@@ -167,6 +187,8 @@ import Sellerside from '@/components/navbar/seller-side.vue'
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/plugins/axios'
+import Skeleton from '@/components/Skeleton.vue'
+import { showError,showSuccess } from '@/utils/alert'
 
 const route = useRoute()
 const router = useRouter()
@@ -178,6 +200,7 @@ const subdistricts = ref([])
 const searchResults = ref([])
 const errorMessages = ref(null)
 const successMessage = ref(null)
+const isLoading = ref(true)
 
 const form = ref({
   user_id: '',
@@ -203,12 +226,18 @@ watch(
     form.value.province_name,
     form.value.zip_code
   ],
-  () => {
+  async () => {
     const { subdistrict_name, district_name, city_name, province_name, zip_code } = form.value
+
     const parts = [subdistrict_name, district_name, city_name, province_name, zip_code].filter(Boolean)
     form.value.label = parts.join(', ')
+
     form.value.kode_domestik = ''
     searchResults.value = []
+
+    if (subdistrict_name && district_name && city_name && province_name && zip_code) {
+      await cariKodeDomestik()
+    }
   }
 )
 
@@ -222,6 +251,7 @@ watch(() => form.value.province_id, (newId) => {    // ⬅️ DIUBAH
 const fetchToko = async () => {
   try {
     const response = await api.get(`/toko?id=${route.params.id}`)
+    isLoading.value = false
     const toko = response.data.data.data[0]
 
     form.value.user_id = toko.user_id
@@ -254,7 +284,7 @@ const fetchToko = async () => {
     }
   } catch (error) {
     console.error('Gagal mengambil data toko:', error)
-    alert('Gagal mengambil data toko.')
+    showError('Gagal mengambil data toko.')
   }
 }
 
@@ -282,11 +312,18 @@ const submitForm = async () => {
 
     await api.post(`/toko/alamat/${route.params.id}`, alamatForm)
 
-    alert('Toko & alamat berhasil diperbarui!')
-    router.push('/managetoko')
+    showSuccess('Toko & alamat berhasil diperbarui!')
+    router.push('/manage-toko')
   } catch (error) {
-    console.error('Gagal submit form:', error)
-    alert(error.response?.data?.message || 'Gagal mengubah data toko/alamat.')
+    const errors = error.response?.data?.errors;
+    let errorMessage = error.response?.data?.message || 'Gagal menambahkan produk.';
+
+    if (errors) {
+      const allErrors = Object.values(errors).flat().join('\n');
+      errorMessage = allErrors;
+    }
+
+    showError(errorMessage);
   }
 }
 
@@ -357,6 +394,7 @@ const cariKodeDomestik = async () => {
   try {
     const searchQuery = encodeURIComponent(form.value.label)
     const response = await api.get(`/rajaongkir/domestic?search=${searchQuery}`)
+    console.log("Hasil pencarian kode domestik:", response)
     const results = response.data.data || []
 
     if (results.length === 0) {
@@ -378,10 +416,10 @@ const cariKodeDomestik = async () => {
   }
 }
 
-const pilihAlamatDariDropdown = (event) => {
-  const selectedItem = JSON.parse(event.target.value)
-  form.value.kode_domestik = selectedItem.id
-  form.value.label = selectedItem.label
+const pilihAlamat = (item) => {
+  form.value.kode_domestik = item.id
+  form.value.zip_code = item.zip_code || ''
+  form.value.label = item.label
   searchResults.value = []
 }
 

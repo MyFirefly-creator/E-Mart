@@ -1,0 +1,377 @@
+<template>
+  <sellerside>
+
+    <div class="p-6 overflow-x-auto relative">
+
+      <!-- HEADER -->
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">Manage Produk</h1>
+
+        <div class="bg-white shadow rounded-lg px-4 py-2 flex items-center gap-3 w-60">
+          <div class="flex-1">
+            <p class="text-sm font-bold">{{ user.name }}</p>
+            <p class="text-xs text-gray-600">{{ user.email }}</p>
+          </div>
+          <img
+            :src="user?.foto_profil || 'https://placehold.co/100'"
+            class="w-10 h-10 bg-gray-300 rounded-full"
+          />
+        </div>
+      </div>
+
+      <!-- SEARCH BAR -->
+      <div class="mb-4 flex items-center gap-3">
+        <input
+          type="text"
+          v-model="searchQuery"
+          @keyup.enter="searchProduct"
+          placeholder="Cari produk..."
+          class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#7D0A0A]"
+        />
+        <button
+          @click="searchProduct"
+          class="px-4 py-2 bg-[#7D0A0A] text-white rounded hover:bg-[#5C0707]"
+        >
+          Cari
+        </button>
+      </div>
+
+      <!-- BUTTON -->
+      <router-link
+        class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-5 ml-2"
+        to="/create-produk"
+      >
+        <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
+        <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white">
+          Tambah Produk
+        </span>
+      </router-link>
+
+      <router-link
+        class="group relative inline-block overflow-hidden border border-[#7D0A0A] px-8 py-3 mb-5 ml-2"
+        to="/manage-foto-product"
+      >
+        <span class="absolute inset-x-0 bottom-0 h-[2px] bg-[#7D0A0A] transition-all group-hover:h-full"></span>
+        <span class="relative text-sm font-medium text-[#7D0A0A] group-hover:text-white">
+          Manage Foto
+        </span>
+      </router-link>
+
+
+      <!-- ================= LOADING ================= -->
+      <template v-if="isLoading">
+        <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
+          <table class="min-w-full table-fixed">
+            <thead class="bg-gray-200">
+              <tr>
+                <th class="px-4 py-2">Nama</th>
+                <th class="px-4 py-2">Harga</th>
+                <th class="px-4 py-2">Stok</th>
+                <th class="px-4 py-2">Status</th>
+                <th class="px-4 py-2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="n in 6" :key="n" class="border-t">
+                <td class="px-4 py-3">
+                  <Skeleton width="120px" height="14px"/>
+                </td>
+                <td class="px-4 py-3">
+                  <Skeleton width="60px" height="14px"/>
+                </td>
+                <td class="px-4 py-3">
+                  <Skeleton width="40px" height="14px"/>
+                </td>
+                <td class="px-4 py-3">
+                  <Skeleton width="80px" height="14px"/>
+                </td>
+                <td class="px-4 py-3 flex gap-2">
+                  <Skeleton width="60px" height="30px"/>
+                  <Skeleton width="60px" height="30px"/>
+                  <Skeleton width="60px" height="30px"/>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+
+      <!-- ================= DATA ================= -->
+      <template v-else-if="product.length">
+        <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-300">
+          <table class="min-w-full table-fixed divide-y divide-gray-200">
+            <thead class="bg-gray-200">
+              <tr>
+                <th class="w-1/4 px-4 py-2 text-left text-sm font-semibold text-gray-700">Nama</th>
+                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Harga</th>
+                <th class="w-1/12 px-4 py-2 text-left text-sm font-semibold text-gray-700">Stok</th>
+                <th class="w-1/6 px-4 py-2 text-left text-sm font-semibold text-gray-700">Status</th>
+                <th class="w-1/4 px-4 py-2 text-left text-sm font-semibold text-gray-700">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr v-for="produk in product" :key="produk.id">
+                <td class="px-4 py-2 text-sm">{{ produk.nama_product }}</td>
+                <td class="px-4 py-2 text-sm">{{ produk.harga }}</td>
+                <td class="px-4 py-2 text-sm">{{ produk.stock }}</td>
+                <td class="px-4 py-2 text-sm">{{ produk.status_produk }}</td>
+                <td class="px-4 py-2 flex flex-wrap gap-2 items-center">
+                  <button
+                    @click="openDetail(produk)"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+                  >
+                    Detail
+                  </button>
+                  <router-link
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+                    :to="`/edit-produk/${produk.id}`"
+                  >
+                    Edit
+                  </router-link>
+                  <button
+                    @click="deleteProduct(produk.id)"
+                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                  >
+                    Hapus
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-if="product.length" class="flex justify-center mt-4 space-x-2 mb-4">
+            <button
+              @click="changePage(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+            >
+              Previous
+            </button>
+
+            <button
+              v-for="page in lastPage"
+              :key="page"
+              @click="changePage(page)"
+              :class="['px-3 py-1 rounded', page === currentPage ? 'bg-[#7D0A0A] text-white' : 'bg-gray-200 text-gray-700']"
+            >
+              {{ page }}
+            </button>
+
+            <button
+              @click="changePage(currentPage + 1)"
+              :disabled="currentPage === lastPage"
+              class="px-3 py-1 bg-gray-300 text-gray-700 rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </template>
+
+      <!-- ================= EMPTY ================= -->
+      <template v-else>
+        <div class="text-center py-20 text-gray-400">
+          Belum ada produk
+        </div>
+      </template>
+
+      <!-- ================= MODAL DETAIL ================= -->
+      <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+          <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+            <h2 class="text-xl font-bold text-gray-800">Detail Produk</h2>
+            <button @click="closeDetail" class="text-gray-500 hover:text-red-500 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="p-6 overflow-y-auto flex-1" v-if="selectedProduct">
+            <div class="flex flex-col md:flex-row gap-6">
+              <div class="w-full md:w-1/3 flex-shrink-0">
+                <img
+                  :src="selectedProduct.foto_cover"
+                  class="w-full aspect-square object-cover rounded-lg shadow-sm border"
+                  alt="Foto Produk"
+                />
+              </div>
+              
+              <div class="w-full md:w-2/3 space-y-4">
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Nama Produk</h3>
+                  <p class="text-lg font-medium text-gray-900">{{ selectedProduct.nama_product }}</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Harga</h3>
+                    <p class="text-base text-gray-900">{{ selectedProduct.harga }}</p>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Stok</h3>
+                    <p class="text-base text-gray-900">{{ selectedProduct.stock }}</p>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Status</h3>
+                    <p class="text-base">
+                      <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800" v-if="selectedProduct.status_produk === 'Aktif'">{{ selectedProduct.status_produk }}</span>
+                      <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800" v-else>{{ selectedProduct.status_produk }}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Deskripsi</h3>
+                  <div class="bg-gray-50 p-3 rounded border text-sm text-gray-700 whitespace-pre-wrap">
+                    {{ selectedProduct.deskripsi || '-' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="p-4 border-t bg-gray-50 flex justify-end">
+            <button @click="closeDetail" class="px-6 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors">
+              Tutup
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </sellerside>
+</template>
+  
+<script setup>
+import sellerside from '@/components/navbar/seller-side.vue';
+import { ref, onMounted } from 'vue';
+import api from "@/plugins/axios";
+import Skeleton from '@/components/Skeleton.vue';
+import { showSuccess, showError, showConfirm } from '@/utils/alert';
+
+const product = ref([]);
+const user = ref({});
+const isLoading = ref(true);
+const currentPage = ref(1);
+const lastPage = ref(1);
+const searchQuery = ref(''); 
+
+// Modal State
+const isModalOpen = ref(false);
+const selectedProduct = ref(null);
+
+const openDetail = (produk) => {
+  selectedProduct.value = produk;
+  isModalOpen.value = true;
+};
+
+const closeDetail = () => {
+  isModalOpen.value = false;
+  selectedProduct.value = null;
+};
+
+const deleteProduct = async (id) => {
+  const konfirmasi = await showConfirm('Yakin ingin menghapus Produk ini?');
+  if (!konfirmasi) return;
+
+  try {
+    await api.delete(`/product/${id}`);
+    product.value = product.value.filter(p => p.id !== id);
+    showSuccess('Produk berhasil dihapus.');
+    await getProduct();
+  } catch (error) {
+    console.error('Gagal menghapus produk:', error);
+    showError(error.response?.data?.message || 'Terjadi kesalahan saat menghapus produk.');
+  }
+};
+
+const getProfile = async () => {
+  try {
+    const response = await api.get('/profile');
+    user.value = response.data.data;
+  } catch (error) {
+    console.error('Gagal mengambil profil:', error);
+  }
+};
+
+const getProduct = async (page = 1) => {
+  try {
+    const response = await api.get('/product/myproducts', {
+      params: { myproducts: true, page }
+    });
+
+    if (response.data.data && Array.isArray(response.data.data.data)) {
+      product.value = response.data.data.data;
+      currentPage.value = response.data.data.current_page;
+      lastPage.value = response.data.data.last_page;
+    } else {
+      product.value = [];
+      console.warn("Tidak ada produk:", response.data.message || "No Data");
+    }
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    product.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const searchProduct = async (page = 1) => {
+  isLoading.value = true;
+  try {
+    const response = await api.get('/product/myproducts', {
+      params: { myproducts: true, page, nama_product: searchQuery.value }
+    });
+
+    if (response.data.data && Array.isArray(response.data.data.data)) {
+      product.value = response.data.data.data;
+      currentPage.value = response.data.data.current_page;
+      lastPage.value = response.data.data.last_page;
+    } else {
+      product.value = [];
+      console.warn("Tidak ada produk:", response.data.message || "No Data");
+    }
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    product.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const changePage = async (page) => {
+  if (page < 1 || page > lastPage.value) return;
+
+  if (searchQuery.value) {
+    await searchProduct(page); 
+  } else {
+    await getProduct(page);
+  }
+};
+
+onMounted(async () => {
+  await getProfile();
+  await getProduct();
+});
+</script>
+
+<style scoped>
+table {
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  table {
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+  }
+}
+</style>
+
+  
