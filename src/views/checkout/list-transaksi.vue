@@ -165,9 +165,9 @@ const getTransaksi = async (page = 1) => {
     const response = await api.get('/transaction?uncompleted',{
       params: { page }
     });
-    console.log(response)
+    // console.log(response)
     const allData = response.data?.data?.data ?? []; 
-    console.log('Data transaksi:', allData);
+    // console.log('Data transaksi:', allData);
     transaksiList.value = allData;
 
     pagination.value.current_page = response.data?.data?.current_page || 1;

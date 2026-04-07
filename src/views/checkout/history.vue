@@ -318,7 +318,7 @@ const getShipment = async () => {
   try {
     const response = await api.get('/pengiriman/buyer')
     shipmentList.value = response.data.data.data || []
-    console.log('Shipment List:', shipmentList.value)
+    // console.log('Shipment List:', shipmentList.value)
   } catch (error) {
     console.error(error)
   } finally {

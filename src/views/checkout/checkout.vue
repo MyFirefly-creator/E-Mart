@@ -366,7 +366,7 @@ const getCheckout = async () => {
       }))
     }));
 
-    console.log("Data checkout:", checkout.value);
+    // console.log("Data checkout:", checkout.value);
   } catch (error) {
     console.error(error);
   } finally {
@@ -451,7 +451,7 @@ const updateSelectedOngkir = (toko) => {
     ongkir: t.biayaPengiriman,
     alamat_id: selectedAlamat.value
   }));
-  console.log("Kurir payload terbaru:", kurirPayload);
+  // console.log("Kurir payload terbaru:", kurirPayload);
 };
 
 
@@ -486,7 +486,7 @@ const checkoutCart = async () => {
       alamat_id: selectedAlamat.value
     };
 
-    console.log("Payload checkout dikirim:", payload);
+    // console.log("Payload checkout dikirim:", payload);
 
     const res = await api.post(`/transaction/payment/${kodeTransaksi.value}`, payload);
     const snapToken = res.data.data.snap_token;

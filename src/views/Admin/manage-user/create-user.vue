@@ -186,7 +186,7 @@ const submitForm = async () => {
     })
 
     showSuccess('User berhasil ditambahkan!')
-    console.log('Response:', response.data)
+    // console.log('Response:', response.data)
 
     router.push('/manageUser') 
   } catch (error) {

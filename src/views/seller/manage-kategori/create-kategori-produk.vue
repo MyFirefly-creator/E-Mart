@@ -156,7 +156,7 @@ const selectCategory = (category) => {
 // Submit
 const submitForm = async () => {
   try {
-    console.log('Data dikirim:', form.value)
+    // console.log('Data dikirim:', form.value)
     const response = await api.post('/category-product', form.value)
     showSuccess('Category Produk Berhasil Ditambahkan!')
     form.value = { product_id: '', category_id: '' }

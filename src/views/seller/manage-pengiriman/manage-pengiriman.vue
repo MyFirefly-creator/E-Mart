@@ -283,7 +283,7 @@ const getProfile = async () => {
     const response = await api.get('/profile')
     user.value = response.data.data
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 

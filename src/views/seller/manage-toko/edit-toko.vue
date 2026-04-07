@@ -394,7 +394,7 @@ const cariKodeDomestik = async () => {
   try {
     const searchQuery = encodeURIComponent(form.value.label)
     const response = await api.get(`/rajaongkir/domestic?search=${searchQuery}`)
-    console.log("Hasil pencarian kode domestik:", response)
+    // console.log("Hasil pencarian kode domestik:", response)
     const results = response.data.data || []
 
     if (results.length === 0) {

@@ -170,7 +170,7 @@ const getProduct = async (page = 1) => {
   try {
     const response = await api.get(`/product/myproducts?page=${page}`);
     ProductSeller.value = response.data.data.data;
-    console.log(ProductSeller.value);
+    // console.log(ProductSeller.value);
     currentPage.value = response.data.data.current_page;
     lastPage.value = response.data.data.last_page;
   } catch (error) {

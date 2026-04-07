@@ -314,7 +314,7 @@ const cariKodeDomestik = async () => {
     } else if (results.length === 1) {
       form.value.kode_domestik = results[0].id; 
       form.value.zip_code = results[0].zip_code || '';
-      console.log(form.value.zip_code);
+      // console.log(form.value.zip_code);
       searchResults.value = [];
     } else {
       searchResults.value = results;
