@@ -164,6 +164,8 @@ const logout = async () => {
 }
 
 onMounted(() => {
-  getProfile()
+  if (localStorage.getItem("token")) {
+    getProfile()
+  }
 })
 </script>
