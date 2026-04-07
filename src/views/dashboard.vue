@@ -57,10 +57,6 @@
       <div v-for="product in products" :key="product.id">
         <Product :product="product" :namaToko="getNamaToko(product)" class="h-72"/>
       </div>
-
-      <div v-for="product in products" :key="product.id">
-        {{ product.nama_product }}
-      </div>
     </template>
 
     <!-- Tidak ada produk -->
