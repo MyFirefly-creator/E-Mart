@@ -4,7 +4,7 @@
 
   <!-- Carousel/Slider gambar -->
   <div class="p-4">
-    <carousel :images="imagesA" />
+    <Carousel :images="imagesA" />
   </div>
 
   <!-- Kategori produk -->
