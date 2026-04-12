@@ -32,7 +32,7 @@
         'px-4 py-1 rounded-full whitespace-nowrap',
         selectedCategories.includes(cat.id)
           ? 'bg-[#7D0A0A] text-white'
-          : 'border border-[#7D0A0A] text-[#7D0A0A]'
+          : 'border border-[#7D0A0A] text-[#7D0A0A] navbar-font'
       ]"
     >
       {{ cat.nama_category }}
@@ -55,7 +55,7 @@
     <!-- Produk -->
     <template v-else>
       <div v-for="product in products" :key="product.id">
-        <Product :product="product" :namaToko="getNamaToko(product)" class="h-72"/>
+        <product :product="product" :namaToko="getNamaToko(product)" class="h-72"/>
       </div>
     </template>
 
@@ -73,7 +73,7 @@
   <div v-if="currentPage < lastPage" class="flex justify-center my-6">
     <button
       @click="loadMore"
-      class="bg-[#7D0A0A] text-white px-6 py-2 rounded hover:bg-[#BF3131] transition"
+      class="bg-[#7D0A0A] text-white px-6 py-2 rounded hover:bg-[#BF3131] transition inter-font"
       :disabled="isLoading"
     >
       {{ isLoading ? 'Memuat...' : 'Tampilkan Lebih Banyak' }}
@@ -85,7 +85,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Navbar from '@/components/navbar/navbar.vue'
-import Product from '@/components/card/product.vue'
+import product from '@/components/card/product.vue'
 import api from "@/plugins/axios"
 import Skeleton from "@/components/Skeleton.vue"
 import Carousel from '@/components/card/carousel.vue'
@@ -121,17 +121,26 @@ const doSearch = (data) => {
 
 // Fungsi cek role user & redirect jika admin
 const checkRoleAndRedirect = async () => {
+  if (!localStorage.getItem("token")) return
+
   try {
     const response = await api.get('/profile')
+
     const role = response.data.data.nama_role
     userName.value = response.data.data.name
     userRole.value = role
 
     if (role === 'admin') {
-      router.push('/admin') // Redirect admin ke halaman admin
+      router.push('/admin')
     }
-  } catch {
-    isLoggedIn.value = false
+
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      console.log("LOGIS MAS")
+      isLoggedIn.value = false
+      return
+    }
+    console.error(error)
   }
 }
 

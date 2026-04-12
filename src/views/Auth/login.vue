@@ -16,7 +16,7 @@
 
       <!-- Login Form -->
       <div class="w-full md:w-1/2 bg-[#7D0A0A] text-white p-10 text-center">
-        <h2 class="text-2xl navbar-font mb-6">Login</h2>
+        <h2 class="text-2xl navbar-font mb-6">Login ke eleven market</h2>
         <form @submit.prevent="loginUser" class="space-y-4">
           <input
             v-model="form.email"
@@ -35,7 +35,13 @@
           <button
             type="submit"
             :disabled="loading"
-            class="w-full p-3 font-bold rounded border-2 border-[#BF3131] bg-white text-[#7D0A0A] hover:bg-[#BF3131] hover:text-white hover:border-[#7D0A0A] transition duration-300 oswald-font"
+            class="w-full p-3 font-bold rounded-lg
+                  bg-white text-[#BF3131] border-2 border-[#BF3131]
+                  hover:bg-[#BF3131] hover:text-white
+                  shadow-md hover:shadow-lg
+                  active:scale-95 transition duration-200
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                  oswald-font"
           >
             {{ loading ? 'Logging in...' : 'Login' }}
           </button>
