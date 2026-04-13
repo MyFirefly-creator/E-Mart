@@ -4,7 +4,7 @@
 
   <!-- Carousel/Slider gambar -->
   <div class="p-4">
-    <Carousel :images="imagesA" />
+    <carousel :images="imagesA" />
   </div>
 
   <!-- Kategori produk -->
@@ -55,7 +55,7 @@
     <!-- Produk -->
     <template v-else>
       <div v-for="product in products" :key="product.id">
-        <Product :product="product" :namaToko="getNamaToko(product)" class="h-72"/>
+        <product :product="product" :namaToko="getNamaToko(product)" class="h-72"/>
       </div>
     </template>
 
